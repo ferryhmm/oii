@@ -1,23 +1,32 @@
 console.log("starting extension...");
 ii(0);
 
-// Handle initial page load
-if (document.readyState === "complete") {
-    // If the page is already loaded, run the logic immediately
-    ii(0);
-} else {
-    // Otherwise, wait for the page to finish loading
-    window.addEventListener("load", () => ii(0));
-}
-
-// Listen for SPA navigation events (URL changes without full page reload)
-window.addEventListener("popstate", () => {
-    console.log("popstate detected");
-    // Re-run the function on URL change
+// Initialize the MutationObserver to handle dynamic content
+const observer = new MutationObserver(() => {
+    // Call the function to check URL and refresh when needed
     handleUrlChange();
 });
 
-// Listen for URL changes through pushState (used by SPAs)
+// Start observing the body for changes to dynamically update the page
+observer.observe(document.body, {
+    childList: true,    // Watch for additions/removals of child nodes
+    subtree: true       // Watch within the entire document
+});
+
+// Ensure the `ii()` function is triggered on SPA navigation and page load
+if (document.readyState === "complete") {
+    ii(0);  // If already loaded, immediately execute
+} else {
+    window.addEventListener("load", () => ii(0));  // Trigger on initial page load
+}
+
+// Listen for internal SPA navigation (URL changes without a full page reload)
+window.addEventListener("popstate", () => {
+    console.log("popstate detected");
+    handleUrlChange();
+});
+
+// Override `pushState` to detect SPA navigations
 const originalPushState = history.pushState;
 history.pushState = function () {
     originalPushState.apply(history, arguments);
@@ -25,7 +34,7 @@ history.pushState = function () {
     handleUrlChange();
 };
 
-// Listen for URL changes through replaceState (used by SPAs)
+// Override `replaceState` to detect SPA navigations
 const originalReplaceState = history.replaceState;
 history.replaceState = function () {
     originalReplaceState.apply(history, arguments);
@@ -33,42 +42,29 @@ history.replaceState = function () {
     handleUrlChange();
 };
 
-// This function checks the URL and triggers the refresh
+// This function checks the current URL and triggers the refresh process if it matches
 function handleUrlChange() {
-    // Check if the new URL matches the user page pattern
-    const regex = /\/users\/\d+(\/osu)?$/;
+    // Match user profile pages, both /osu and /<gamemode> (taiko, mania, fruits, etc)
+    const regex = /\/users\/\d+(\/osu|\/taiko|\/mania|\/fruits)?$/;
     if (regex.test(window.location.pathname)) {
-        ii(0);  // Re-run the ii function when the URL matches
+        console.log("URL matches user profile page, refreshing...");
+        ii(0);  // Trigger the ii function to refresh the data
     }
 }
 
-// Observe changes in the page content for dynamic updates
-const observer = new MutationObserver(() => {
-    handleUrlChange(); // Run handleUrlChange when DOM changes
-});
-
-// Start observing body element for changes in the URL
-observer.observe(document.body, {
-    childList: true,  // Watch for additions/removals of child nodes
-    subtree: true      // Watch within the entire body
-});
-
-window.navigation.addEventListener("navigate", (event) => {
-    console.log("navigate detected");
-    // Matches /users/<id>/osu though the /osu is optional and other gamemodes (taiko, mania, fruits) won't match
-    const regex = /\/users\/\d+(\/osu)?$/;
-    if (regex.test(event.destination.url)) ii(0);
-});
-
+// The main function to execute the logic for the profile page
 function ii(additionalPlaytimeHours) {
     console.log("executing...");
+
+    // Wait for the necessary elements to be available, then execute logic
     waitForElements('.value-display__label', function () {
         let pp = 0;
         let playtime = additionalPlaytimeHours;
 
+        // Find the pp and playtime elements on the page
         const labels = document.querySelectorAll('.value-display__label');
         labels.forEach(label => {
-            // Searches for pp, then gets playtime by sibling (because pp is the same in every language)
+            // Searches for 'pp', then gets playtime by sibling element
             if (label.textContent.trim() === 'pp') {
                 const ppElement = label.nextElementSibling.querySelector('.value-display__value div');
                 const playtimeElement = ppElement.parentElement.parentElement.nextElementSibling.querySelector('.value-display__value span');
@@ -84,7 +80,7 @@ function ii(additionalPlaytimeHours) {
         let expectedPlaytime = 0.0183 * Math.pow(pp, 1.2);
         let iiValue = expectedPlaytime / playtime;
 
-        // Insert ii on website
+        // Insert ii value on the page
         updateElementStyles();
         updateElementGap('8px');
 
@@ -96,6 +92,7 @@ function ii(additionalPlaytimeHours) {
             console.log('Element with ID "iiElement" has been removed.');
         }
 
+        // Create and insert the new element displaying ii
         const outerDiv = document.createElement('div');
         outerDiv.className = 'value-display value-display--plain';
         outerDiv.id = 'iiElement';
@@ -115,21 +112,20 @@ function ii(additionalPlaytimeHours) {
     });
 }
 
+// Wait for elements to load and call the callback when found
 function waitForElements(selector, callback) {
-    // Check if the elements are already available, if yes, run the callback
     if (document.querySelectorAll(selector).length > 0) {
-        callback();
+        callback();  // If the elements are already available, run the callback
     } else {
-        // Use MutationObserver to watch for elements being added to the DOM
         const observer = new MutationObserver((mutations, obs) => {
             if (document.querySelectorAll(selector).length > 0) {
-                callback();
-                obs.disconnect(); // Stop observing once the elements are found
+                callback();  // Run the callback when the elements are available
+                obs.disconnect();  // Stop observing once found
             }
         });
         observer.observe(document.body, {
-            childList: true, // Watch for additions/removals of child nodes
-            subtree: true     // Watch within the entire body
+            childList: true,
+            subtree: true
         });
     }
 }
@@ -153,11 +149,10 @@ function predictFuture(goalpp) {
         }
     });
 
-    // Calculate predicted playtime
     return playtime * Math.pow(goalpp / pp, 1.2);
 }
 
-// Function to update grid-template-columns for elements with the class
+// Update the grid template columns for the profile details
 function updateElementStyles() {
     const elements = document.querySelectorAll('.profile-detail__values--grid');
     elements.forEach(element => {
@@ -165,6 +160,7 @@ function updateElementStyles() {
     });
 }
 
+// Update the gap for profile detail values
 function updateElementGap(newGap) {
     const elements = document.querySelectorAll('.profile-detail__values');
     elements.forEach(element => {
