@@ -1,17 +1,28 @@
 console.log("starting extension...");
-ii(0);
+let isExecuting = false;  // Flag to check if the function is currently running
+let observer;  // Declare observer variable for easy removal later
 
 // Initialize the MutationObserver to handle dynamic content
-const observer = new MutationObserver(() => {
-    // Call the function to check URL and refresh when needed
-    handleUrlChange();
-});
+function startObserver() {
+    observer = new MutationObserver(() => {
+        // Call the function to check URL and refresh when needed
+        handleUrlChange();
+    });
 
-// Start observing the body for changes to dynamically update the page
-observer.observe(document.body, {
-    childList: true,    // Watch for additions/removals of child nodes
-    subtree: true       // Watch within the entire document
-});
+    // Start observing the body for changes to dynamically update the page
+    observer.observe(document.body, {
+        childList: true,    // Watch for additions/removals of child nodes
+        subtree: true       // Watch within the entire document
+    });
+}
+
+// Stop the MutationObserver to prevent it from running in the background
+function stopObserver() {
+    if (observer) {
+        observer.disconnect();  // Stop the mutation observer when it's no longer needed
+        console.log("MutationObserver stopped.");
+    }
+}
 
 // Ensure the `ii()` function is triggered on SPA navigation and page load
 if (document.readyState === "complete") {
@@ -54,6 +65,10 @@ function handleUrlChange() {
 
 // The main function to execute the logic for the profile page
 function ii(additionalPlaytimeHours) {
+    // Prevent execution if it's already running
+    if (isExecuting) return;
+    isExecuting = true; // Set the flag to prevent re-execution
+
     console.log("executing...");
 
     // Wait for the necessary elements to be available, then execute logic
@@ -109,6 +124,11 @@ function ii(additionalPlaytimeHours) {
         outerDiv.appendChild(valueDiv);
 
         parentElement.appendChild(outerDiv);
+
+        // Reset the execution flag after a delay (to avoid multiple calls)
+        setTimeout(() => {
+            isExecuting = false;  // Reset the flag to allow further executions
+        }, 3000);  // Add delay to avoid re-execution for 3 seconds (adjust as necessary)
     });
 }
 
