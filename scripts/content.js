@@ -33,13 +33,25 @@ history.replaceState = function () {
     handleUrlChange();
 };
 
+// This function checks the URL and triggers the refresh
 function handleUrlChange() {
     // Check if the new URL matches the user page pattern
     const regex = /\/users\/\d+(\/osu)?$/;
     if (regex.test(window.location.pathname)) {
-        ii(0);
+        ii(0);  // Re-run the ii function when the URL matches
     }
 }
+
+// Observe changes in the page content for dynamic updates
+const observer = new MutationObserver(() => {
+    handleUrlChange(); // Run handleUrlChange when DOM changes
+});
+
+// Start observing body element for changes in the URL
+observer.observe(document.body, {
+    childList: true,  // Watch for additions/removals of child nodes
+    subtree: true      // Watch within the entire body
+});
 
 window.navigation.addEventListener("navigate", (event) => {
     console.log("navigate detected");
