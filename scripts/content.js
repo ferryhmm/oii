@@ -1,22 +1,21 @@
 console.log("starting extension...");
 let isExecuting = false;  // Flag to track if the function is already running
-let observer;  // Observer for detecting changes to the DOM
+let observer;  // MutationObserver to detect changes in the DOM (for SPA)
 
-// This function initializes the MutationObserver to detect SPA navigation
 function startObserver() {
+    // Start observing changes to the DOM (e.g., after a page change in SPA)
     observer = new MutationObserver(() => {
-        // Handle the URL change and re-trigger logic for dynamic updates
+        // Re-trigger the URL change handler on every DOM mutation
         handleUrlChange();
     });
 
-    // Observe the body for changes (detects SPA navigation)
+    // Observe the body for changes (SPA navigation could modify the DOM)
     observer.observe(document.body, {
-        childList: true,
-        subtree: true
+        childList: true,    // Watch for additions/removals of child nodes
+        subtree: true       // Observe entire document body
     });
 }
 
-// Function to stop the MutationObserver when it's no longer needed
 function stopObserver() {
     if (observer) {
         observer.disconnect();
@@ -24,9 +23,9 @@ function stopObserver() {
     }
 }
 
-// Function to handle URL change, either on page load or SPA navigation
+// This function checks if the current URL is a user profile page
 function handleUrlChange() {
-    // Check if the current URL matches the user profile page pattern
+    // Regex to match URLs for osu! user profiles (including gamemode subpages)
     const regex = /\/users\/\d+(\/osu|\/taiko|\/mania|\/fruits)?$/;
     if (regex.test(window.location.pathname)) {
         console.log("URL matches user profile page, refreshing...");
@@ -34,51 +33,49 @@ function handleUrlChange() {
     }
 }
 
-// Check if the page is already loaded, if yes, trigger ii immediately
+// Trigger function when page is loaded
 if (document.readyState === "complete") {
     ii(0);  // If the page is fully loaded, immediately execute ii
 } else {
     window.addEventListener("load", () => ii(0));  // Trigger on initial page load
 }
 
-// Listen for popstate events (triggered by navigation in SPAs)
+// Handle browser back/forward buttons (SPA navigation)
 window.addEventListener("popstate", () => {
     console.log("popstate detected");
-    handleUrlChange();  // Handle URL change when using browser's back/forward buttons
+    handleUrlChange();  // Recheck URL after a browser navigation event
 });
 
-// Override `pushState` to detect URL changes in SPA navigation
+// Override `pushState` and `replaceState` to capture SPA navigation
 const originalPushState = history.pushState;
 history.pushState = function () {
     originalPushState.apply(history, arguments);
     console.log("pushState detected");
-    handleUrlChange();  // Handle URL change after SPA navigation
+    handleUrlChange();  // Recheck URL after changing history state
 };
 
-// Override `replaceState` for SPA navigations (when the URL is updated without reloading)
 const originalReplaceState = history.replaceState;
 history.replaceState = function () {
     originalReplaceState.apply(history, arguments);
     console.log("replaceState detected");
-    handleUrlChange();  // Handle URL change after replacing the state
+    handleUrlChange();  // Recheck URL after replacing history state
 };
 
-// The main function to execute the logic for the profile page
+// The main function to handle logic on the user profile page
 function ii(additionalPlaytimeHours) {
     if (isExecuting) return;  // Prevent execution if already running
-    isExecuting = true;  // Set flag to true, indicating the function is running
+    isExecuting = true;  // Set flag to prevent duplicate execution
 
     console.log("executing...");
 
-    // Wait for necessary elements to be available before proceeding
+    // Wait for elements to be available on the page
     waitForElements('.value-display__label', function () {
         let pp = 0;
         let playtime = additionalPlaytimeHours;
 
-        // Find the pp and playtime elements on the page
+        // Iterate over the page labels to find 'pp' and 'playtime'
         const labels = document.querySelectorAll('.value-display__label');
         labels.forEach(label => {
-            // Look for the 'pp' label, then get playtime from the sibling element
             if (label.textContent.trim() === 'pp') {
                 const ppElement = label.nextElementSibling.querySelector('.value-display__value div');
                 const playtimeElement = ppElement.parentElement.parentElement.nextElementSibling.querySelector('.value-display__value span');
@@ -94,7 +91,7 @@ function ii(additionalPlaytimeHours) {
         let expectedPlaytime = 0.0183 * Math.pow(pp, 1.2);
         let iiValue = expectedPlaytime / playtime;
 
-        // Insert the ii value on the page
+        // Insert ii value on the page
         updateElementStyles();
         updateElementGap('8px');
 
@@ -124,23 +121,23 @@ function ii(additionalPlaytimeHours) {
 
         parentElement.appendChild(outerDiv);
 
-        // Reset the execution flag after a small delay to prevent spamming
+        // Reset the execution flag after a delay to avoid re-execution
         setTimeout(() => {
             isExecuting = false;  // Allow the function to run again after 3 seconds
-        }, 3000);  // Adjust the delay (in ms) as needed
+        }, 3000);  // Adjust the delay time as necessary
     });
 }
 
-// Wait for specific elements to load before running the callback
+// Wait for elements to appear before executing callback
 function waitForElements(selector, callback) {
     if (document.querySelectorAll(selector).length > 0) {
-        callback();  // If elements are already present, run the callback immediately
+        callback();  // If elements already exist, call the callback immediately
     } else {
-        // Use MutationObserver to detect when elements are added to the DOM
+        // Use MutationObserver to detect when the required elements are added
         const observer = new MutationObserver((mutations, obs) => {
             if (document.querySelectorAll(selector).length > 0) {
-                callback();  // Run the callback when elements are found
-                obs.disconnect();  // Stop observing once the elements are available
+                callback();  // Execute callback once the elements are found
+                obs.disconnect();  // Stop observing after elements are found
             }
         });
         observer.observe(document.body, {
@@ -150,6 +147,39 @@ function waitForElements(selector, callback) {
     }
 }
 
+// Update the grid layout style to accommodate the new "ii" element
+function updateElementStyles() {
+    const elements = document.querySelectorAll('.profile-detail__values--grid');
+    elements.forEach(element => {
+        element.style.gridTemplateColumns = 'repeat(5, 1fr)';
+    });
+}
+
+// Adjust the gap between elements for improved layout
+function updateElementGap(newGap) {
+    const elements = document.querySelectorAll('.profile-detail__values');
+    elements.forEach(element => {
+        element.style.gap = newGap;
+    });
+}
+
+// Listen for external messages from the extension
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+        console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
+        if (request.additionalPlaytimeHours) {
+            ii(Number(request.additionalPlaytimeHours));
+            console.log("ii executed with additional playtime");
+            sendResponse(request);
+        }
+        if (request.goalpp) {
+            console.log("goalpp requested");
+            sendResponse(predictFuture(Number(request.goalpp)));
+        }
+    }
+);
+
+// Predict future playtime based on a given goal PP
 function predictFuture(goalpp) {
     let pp = 0;
     let playtime = 0;
@@ -168,37 +198,5 @@ function predictFuture(goalpp) {
         }
     });
 
-    // Calculate predicted future playtime based on goal pp
     return playtime * Math.pow(goalpp / pp, 1.2);
 }
-
-// Update the grid styles to accommodate the new value element
-function updateElementStyles() {
-    const elements = document.querySelectorAll('.profile-detail__values--grid');
-    elements.forEach(element => {
-        element.style.gridTemplateColumns = 'repeat(5, 1fr)';
-    });
-}
-
-// Update the gap between elements for better layout
-function updateElementGap(newGap) {
-    const elements = document.querySelectorAll('.profile-detail__values');
-    elements.forEach(element => {
-        element.style.gap = newGap;
-    });
-}
-
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
-        console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
-        if (request.additionalPlaytimeHours) {
-            ii(Number(request.additionalPlaytimeHours));
-            console.log("ii executed with additional playtime");
-            sendResponse(request);
-        }
-        if (request.goalpp) {
-            console.log("goalpp requested");
-            sendResponse(predictFuture(Number(request.goalpp)));
-        }
-    }
-);
