@@ -41,37 +41,18 @@
  */
 
 console.log("starting extension...")
-ii(0, true);
+ii(0);
 
-window.navigation.addEventListener("navigate", (event) => {
+window.addEventListener("turbo:render", () => {
     console.log("navigate detected");
     //matches /users/<id>/osu though the /osu is optional and other gamemodes (taiko, mania, fruits) won't match
     const regex = /\/users\/\d+(\/osu)?$/;
-    if (regex.test(event.destination.url))
+    if (regex.test(window.location.pathname))
         ii(0);
 })
 
-async function ii(additionalPlaytimeHours, newLoad = false) {
+function ii(additionalPlaytimeHours) {
     console.log("executing...")
-
-    if (!newLoad) {
-        // Use a MutationObserver to wait for the lazy loaded values to get populated
-        let waitForData = new Promise((resolve, reject) => {
-            var observer = new MutationObserver((mutations) => {
-                mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
-                    if (node.querySelectorAll('.js-react--profile-page')) {
-                        observer.disconnect();
-                        resolve();
-                    }
-                }));
-            });
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
-        await waitForData;
-    }
 
     /**
      * @type UserData
@@ -86,28 +67,6 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
     // Compute expected playtime and ii, prerework: 1.16e-3 * Math.pow(pp, 1.17) and playtime/24
     const expectedPlaytime = 0.0183 * Math.pow(pp, 1.2);
     const ii = expectedPlaytime / playtime;
-
-    // Use a MutationObserver to wait for the lazy loaded values to get populated
-    let waitForDetails = new Promise((resolve, reject) => {
-        // Check if profile values already exist
-        if (document.querySelectorAll('div.value-display--plain').length >= 3) {
-            resolve();
-        } else {
-            var observer = new MutationObserver(_ => {
-                // Check if profile values div were created
-                if (document.querySelectorAll('div.value-display--plain').length >= 3) {
-                    // Stop the observer and resolve
-                    observer.disconnect();
-                    resolve();
-                }
-            });
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        }
-    });
-    await waitForDetails;
 
     // Insert ii on website
     updateElementStyles();
