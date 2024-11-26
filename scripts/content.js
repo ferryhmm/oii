@@ -41,7 +41,7 @@
  */
 
 console.log("starting extension...")
-ii(0);
+ii(0, true);
 
 window.navigation.addEventListener("navigate", (event) => {
     console.log("navigate detected");
@@ -51,56 +51,93 @@ window.navigation.addEventListener("navigate", (event) => {
         ii(0);
 })
 
-function ii(additionalPlaytimeHours) {
+async function ii(additionalPlaytimeHours, newLoad = false) {
     console.log("executing...")
-    /** TODO FIX
-     * 
-     * Timeout of 2 seconds to ensure site is fully loaded. Necessary, bc it's a
-     * SPA and that messes with the document_idle thingy in the manifest, idk what im doing
-     * Yes I know this is a shitty solution and will break when it loads slower than that
-     * */
-    setTimeout(function () {
-        /**
-         * @type UserData
-         */
-        const userData = JSON.parse(document.body.querySelector('.js-react--profile-page').attributes.getNamedItem('data-initial-data').value)
-        const pp = userData.user.statistics.pp;
-        const playtime = userData.user.statistics.play_time + additionalPlaytimeHours * 3600;
 
-        // Compute expected playtime and ii, prerework: 1.16e-3 * Math.pow(pp, 1.17) and playtime/24
-        const expectedpp = 0.001956 * playtime + 67.209899;
-        const ii = pp / expectedpp;
+    if (!newLoad) {
+        // Use a MutationObserver to wait for the lazy loaded values to get populated
+        let waitForData = new Promise((resolve, reject) => {
+            var observer = new MutationObserver((mutations) => {
+                mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
+                    if (node.querySelectorAll('.js-react--profile-page')) {
+                        observer.disconnect();
+                        resolve();
+                    }
+                }));
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+        await waitForData;
+    }
 
-        // Insert ii on website
-        updateElementStyles();
-        updateElementGap('8px');
+    /**
+     * @type UserData
+     */
+    const userData = JSON.parse(document.body.querySelector('.js-react--profile-page').attributes.getNamedItem('data-initial-data').value);
 
-        const parentElement = document.querySelector('.profile-detail__values--grid');
+    if (userData.current_mode != 'osu') return;
 
-        const iiElementAlreadyExists = document.getElementById('iiElement');
+    const pp = userData.user.statistics.pp;
+    const playtime = userData.user.statistics.play_time + additionalPlaytimeHours * 3600;
 
-        if (iiElementAlreadyExists) {
-            iiElementAlreadyExists.remove();
-            console.log('Element with ID "iiElement" has been removed.');
+    // Compute expected playtime and ii, prerework: 1.16e-3 * Math.pow(pp, 1.17) and playtime/24
+    const expectedpp = 0.001956 * playtime + 67.209899;
+    const ii = pp / expectedpp;
+
+    // Use a MutationObserver to wait for the lazy loaded values to get populated
+    let waitForDetails = new Promise((resolve, reject) => {
+        // Check if profile values already exist
+        if (document.querySelectorAll('div.value-display--plain').length >= 3) {
+            resolve();
+        } else {
+            var observer = new MutationObserver(_ => {
+                // Check if profile values div were created
+                if (document.querySelectorAll('div.value-display--plain').length >= 3) {
+                    // Stop the observer and resolve
+                    observer.disconnect();
+                    resolve();
+                }
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
         }
+    });
+    await waitForDetails;
 
-        const outerDiv = document.createElement('div');
-        outerDiv.className = 'value-display value-display--plain';
-        outerDiv.id = 'iiElement';
+    // Insert ii on website
+    updateElementStyles();
+    updateElementGap('8px');
 
-        const labelDiv = document.createElement('div');
-        labelDiv.className = 'value-display__label';
-        labelDiv.textContent = 'ii';
+    const parentElement = document.querySelector('.profile-detail__values--grid');
 
-        const valueDiv = document.createElement('div');
-        valueDiv.className = 'value-display__value';
-        valueDiv.textContent = ii.toFixed(2) + "x";
+    const iiElementAlreadyExists = document.getElementById('iiElement');
 
-        outerDiv.appendChild(labelDiv);
-        outerDiv.appendChild(valueDiv);
+    if (iiElementAlreadyExists) {
+        iiElementAlreadyExists.remove();
+        console.log('Element with ID "iiElement" has been removed.');
+    }
 
-        parentElement.appendChild(outerDiv)
-    }, 2000)
+    const outerDiv = document.createElement('div');
+    outerDiv.className = 'value-display value-display--plain';
+    outerDiv.id = 'iiElement';
+
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'value-display__label';
+    labelDiv.textContent = 'ii';
+
+    const valueDiv = document.createElement('div');
+    valueDiv.className = 'value-display__value';
+    valueDiv.textContent = ii.toFixed(2) + "x";
+
+    outerDiv.appendChild(labelDiv);
+    outerDiv.appendChild(valueDiv);
+
+    parentElement.appendChild(outerDiv)
 }
 
 function predictFuture(goalpp) {
@@ -138,7 +175,7 @@ chrome.runtime.onMessage.addListener(
             "from a content script:" + sender.tab.url :
             "from the extension");
         if (request.additionalPlaytimeHours) {
-            ii(Number(request.additionalPlaytimeHours));
+            ii(Number(request.additionalPlaytimeHours), true);
             console.log("ii lol");
             sendResponse(request);
         }

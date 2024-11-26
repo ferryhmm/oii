@@ -7,7 +7,7 @@
         "default_popup": "popup/popup.html"
     },
     "icons": {
-        "16": "images/hello_extensions.png"
+        "16": "images/oii.png"
     },
     "content_scripts": [
         {
