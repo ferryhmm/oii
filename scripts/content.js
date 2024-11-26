@@ -68,7 +68,7 @@ function ii(additionalPlaytimeHours) {
         const playtime = userData.user.statistics.play_time / 3600 + additionalPlaytimeHours;
 
         // Compute expected playtime and ii, prerework: 1.16e-3 * Math.pow(pp, 1.17) and playtime/24
-        const expectedpp = 0.001956 * Math.pow(playtime, 2) + 67.209899;
+        const expectedpp = 0.001956 * playtime*3600 + 67.209879;
         const ii = pp / expectedpp;
 
         // Insert ii on website
