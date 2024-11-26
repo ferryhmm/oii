@@ -81,11 +81,11 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
     if (userData.current_mode != 'osu') return;
 
     const pp = userData.user.statistics.pp;
-    const playtime = userData.user.statistics.play_time / 3600 + additionalPlaytimeHours;
+    const playtime = userData.user.statistics.play_time + additionalPlaytimeHours * 3600;
 
     // Compute expected playtime and ii, prerework: 1.16e-3 * Math.pow(pp, 1.17) and playtime/24
-    const expectedPlaytime = 0.0183 * Math.pow(pp, 1.2);
-    const ii = expectedPlaytime / playtime;
+    const expectedpp = 0.001956 * playtime + 67.209899;
+    const ii = pp / expectedpp;
 
     // Use a MutationObserver to wait for the lazy loaded values to get populated
     let waitForDetails = new Promise((resolve, reject) => {
