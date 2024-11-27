@@ -10,7 +10,9 @@
 
 <body>
     <div class="triangle-container">
-        <div class="header">Oii - Improvement Indicator</div>
+        <div class="header">
+            Osu - Improvement Indicator
+        </div>
         <div class="content-container">
             <div class="input-container">
                 <div class="mode-selector">
@@ -26,11 +28,24 @@
             <div class="input-container">
                 <div class="calculator">
                     <div>
-                        <label for="additionalPlaytimeHours">Playtime in hours:</label>
+                        <label class="playtime-label" for="additionalPlaytimeHours">
+                            Additional Playtime:
+                            <div class="tooltip tooltip-playtime">
+                                <span class="tooltiptext">
+                                    If you have additional playtime not shown on your profile, 
+                                    e.g. other clients, score v2, offline etc.
+                                </span>
+                            </div>
+                        </label>
                         <input type="text" id="additionalPlaytimeHours" name="additionalPlaytimeHours">
                     </div>
                     <div>
-                        <label for="goalpp">Goal pp:</label>
+                        <label class="goalpp-label" for="goalpp">
+                            Goal pp:
+                            <div class="tooltip tooltip-goalpp">
+                                <span class="tooltiptext">The pp amount you want to reach</span>
+                            </div>
+                        </label>
                         <input type="text" id="goalpp" name="goalpp">
                     </div>
                 </div>

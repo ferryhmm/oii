@@ -114,3 +114,77 @@ input[type="text"]:hover, input[type="text"]:focus {
     color: #ffffff;
 }
 
+
+
+
+/* Tooltip */
+.tooltip {
+    position: absolute;
+    display: inline-block;
+    font-size: 0.6em;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    pointer-events: none;
+}
+
+    .tooltip.tooltip-playtime{
+        top: 47.5%;
+        right: 69.3%;
+    } 
+
+    .tooltip.tooltip-goalpp{
+        top: 47.5%;
+        right: 36%;
+    } 
+
+    .tooltip.tooltip-playtime > .tooltiptext{
+        align-content: center;
+    }
+
+    .tooltip.tooltip-goalpp > .tooltiptext{
+        height: 2em;
+        width: 15.8em;
+        align-content: center;
+    }
+
+    .tooltip .tooltiptext {
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        padding: 0.5em 0 1em 0em;
+        border-radius: 6px;
+        position: absolute;
+        z-index: 1;
+        font-size: 1.4em;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 4em;
+        width: 15em;
+    }
+
+
+.tooltip .tooltiptext::after {
+    content: '';
+    position: absolute;
+    top: 100%; 
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+label.goalpp-label{
+    width: 5em;
+}
+label.playtime-label{
+    width: 10em;
+}
+
+label:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
