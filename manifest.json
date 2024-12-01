@@ -15,6 +15,12 @@
         "48": "images/oii48.png",
         "128": "images/oii128.png"
     },
+    "browser_specific_settings": {
+        "gecko": {
+        "id": "{f0cfba57-913e-48f7-b957-d5def31647d3}"
+        }
+    },
+
     "content_scripts": [
         {
             "js": [
