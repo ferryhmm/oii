@@ -1,5 +1,9 @@
 # oii - osu! improvement indicator
 
+<p align="center">
+  <img src="https://github.com/ferryhmm/oii/blob/main/images/oii128.png" />
+</p>
+
 A browser extension, that adds ii (improvement indicator, a metric that compares your pp to the average player with your playtime amount) to user profiles on the osu! website.
 
 
