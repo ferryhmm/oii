@@ -6,15 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
     additionalPlaytimeHours.addEventListener('change', async () => {
         // Only run the code when the user has entered a value
         if (additionalPlaytimeHours.value) {
-            const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-            const response = await chrome.tabs.sendMessage(tab.id, { additionalPlaytimeHours: additionalPlaytimeHours.value });
+            const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
+            const response = await browser.tabs.sendMessage(tab.id, { additionalPlaytimeHours: additionalPlaytimeHours.value });
         }
     });
 
     goalpp.addEventListener('change', async () => {
         if (goalpp.value) {
-            const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-            const response = await chrome.tabs.sendMessage(tab.id, { goalpp: goalpp.value });
+            const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
+            const response = await browser.tabs.sendMessage(tab.id, { goalpp: goalpp.value });
             const predictFutureElement = document.getElementById("expectedPlaytimeForGoalpp");
             predictFutureElement.textContent = "This player needs approximately " + convertHours(response) + " or " + Math.round(response) + " hours of playtime to reach the given pp";
         }
