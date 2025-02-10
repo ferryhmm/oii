@@ -20,6 +20,7 @@
     "content_scripts": [
         {
             "js": [
+                "popup/browser-polyfill.min.js",
                 "scripts/content.js"
             ],
             "matches": [

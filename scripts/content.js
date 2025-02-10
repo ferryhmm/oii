@@ -164,7 +164,7 @@ function updateElementGap(newGap) {
     });
 }
 
-chrome.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.additionalPlaytimeHours) {
             ii(Number(request.additionalPlaytimeHours), true);
