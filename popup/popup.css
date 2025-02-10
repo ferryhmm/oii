@@ -48,7 +48,7 @@ label {
     color: #f0f0f0;
 }
 
-input[type="text"] {
+input[type="number"] {
     width: 10em;
     padding: 10px;
     border: none;
@@ -58,7 +58,7 @@ input[type="text"] {
     font-size: 14px;
 }
 
-input[type="text"] {
+input[type="number"] {
     transition: all 0.3s ease-in-out;
 }
 
