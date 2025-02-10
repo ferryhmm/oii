@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for when the user inputs a value
     additionalPlaytimeHours.addEventListener('change', async () => {
+        // If empty/null, reset to 0
+        if (!additionalPlaytimeHours.value) additionalPlaytimeHours.value = "0";
+
         // Only run the code when the user has entered a value
         if (additionalPlaytimeHours.value) {
             const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
