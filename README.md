@@ -46,7 +46,7 @@ For the latest stable release and automatic updates, it is recommended to instal
 Alternatively, to get the latest (though not necessarily stable) build, install the extension through these steps. Keep in mind, that the extension will not update automatically this way:
 
 1. Download and unzip the repository
-2. Navigate to the [extensions](chrome://extensions/) in your Chrome browser
+2. Navigate to ```chrome://extensions/``` in your Chrome browser
 3. Enable developer mode (top right)
 4. Click "Load unpacked" and select the osu!ii folder from step 1
 
@@ -63,7 +63,7 @@ For the latest stable release and automatic updates, it is recommended to instal
 Alternatively, to get the latest (though not necessarily stable) build, install the extension through these steps. Keep in mind, that the extension will not update automatically this way and will only stay installed until the next time you restart firefox:
 
 1. Download and unzip the repository
-2. Navigate to the [debugging page](about:debugging) in your Firefox browser
+2. Navigate to ```about:debugging``` in your Firefox browser
 3. Click on "Load Temporary Add-on", then select any file within the osu!ii folder from step 1
 
 Alternatively, you can use [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/) to run the extension from the command line (useful for debugging).
