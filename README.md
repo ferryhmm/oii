@@ -34,21 +34,36 @@ If you have any questions or want to contribute, feel free to join my [discord s
 
 ## How to install
 
-This extension is currently only available for chrome and there are two ways to install it:
+This extension is currently available for Chrome and Firefox with each having two ways to install it:
 
-### Via Chrome Webstore
+### Chrome
+#### Via Chrome Webstore
 
 For the latest stable release and automatic updates, it is recommended to install the extension [here](https://chromewebstore.google.com/detail/oii/dmodoodhamgjfnfnokgflekfjgjagpna).
 
-### Via GitHub
+#### Via GitHub
 
 Alternatively, to get the latest (though not necessarily stable) build, install the extension through these steps. Keep in mind, that the extension will not update automatically this way:
 
 1. Download and unzip the repository
-2. Navigate to the [extensions](chrome://extensions/) in your chrome browser
+2. Navigate to the [extensions](chrome://extensions/) in your Chrome browser
 3. Enable developer mode (top right)
 4. Click "Load unpacked" and select the osu!ii folder from step 1
 
 For a more detailed explanation check out [this](https://www.youtube.com/watch?v=nmSpWQJuTaQ) video tutorial.
 
 
+### Firefox
+#### Via Firefox Addons
+
+For the latest stable release and automatic updates, it is recommended to install the extension [here](https://addons.mozilla.org/en/firefox/addon/oii/).
+
+#### Via GitHub
+
+Alternatively, to get the latest (though not necessarily stable) build, install the extension through these steps. Keep in mind, that the extension will not update automatically this way and will only stay installed until the next time you restart firefox:
+
+1. Download and unzip the repository
+2. Navigate to the [debugging page](about:debugging) in your Firefox browser
+3. Click on "Load Temporary Add-on", then select any file within the osu!ii folder from step 1
+
+Alternatively, you can use [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/) to run the extension from the command line (useful for debugging).

@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "oii",
     "description": "Adds ii (improvement indicator) metric to user profiles on the osu! website",
-    "version": "0.2",
+    "version": "0.3",
     "action": {
         "default_popup": "popup/popup.html"
     },
