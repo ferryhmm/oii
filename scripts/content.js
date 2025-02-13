@@ -40,14 +40,13 @@
  * @property {User} user - The user object
  */
 
-ii(0, true);
 
-window.navigation.addEventListener("navigate", (event) => {
-    //matches /users/<id>/osu though the /osu is optional and other gamemodes (taiko, mania, fruits) won't match
-    const regex = /\/users\/\d+/;
-    if (regex.test(event.destination.url))
-        ii(0);
-})
+if (/\/users\/\d+/.test(document.location.href)) ii(0, true);
+
+window.addEventListener('turbo:load', () => {
+    // Check if we're on a profile page and trigger ii if so
+    if (/\/users\/\d+/.test(document.location.href)) ii(0, true);
+});
 
 async function ii(additionalPlaytimeHours, newLoad = false) {
 
@@ -62,10 +61,7 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
                     }
                 }));
             });
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
+            observer.observe(document.body, { childList: true, subtree: true });
         });
         await waitForData;
     }
@@ -164,7 +160,7 @@ function updateElementGap(newGap) {
     });
 }
 
-chrome.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.additionalPlaytimeHours) {
             ii(Number(request.additionalPlaytimeHours), true);
