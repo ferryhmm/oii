@@ -121,7 +121,16 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
 
     const valueDiv = document.createElement('div');
     valueDiv.className = 'value-display__value';
-    valueDiv.textContent = ii > 0 ? ii.toFixed(2) + "x" : "-";
+    valueDiv.textContent = ii > 0 && pp > 0 && playtime > 0 ? ii.toFixed(2) + "x" : "-";
+
+    let color;
+    if (ii > 1) {
+        color = `hsl(120, 100%, ${100 - 50 * (1 - (1 / ii))}%)`;
+    } else if (ii < 1 && ii > 0) {
+        color = `hsl(0, 100%, ${100 - 50 * (1 - ii)}%)`;
+    }
+
+    valueDiv.style.color = color;
 
     outerDiv.appendChild(labelDiv);
     outerDiv.appendChild(valueDiv);
@@ -175,12 +184,12 @@ browser.runtime.onMessage.addListener(
 function calculateExpectedPlaytime(pp, mode) {
     switch (mode) {
         case "osu":
-            return -3.94 + 0.067 * pp + 6.78e-6 * Math.pow(pp, 2);
+            return -4.49 + 0.0601 * pp + 9.66e-6 * Math.pow(pp, 2);
         case "taiko":
-            return -1.37 + 0.015 * pp + 3.1e-6 * Math.pow(pp, 2);
+            return -0.159 + 8.91e-3 * pp + 3.29e-6 * Math.pow(pp, 2);
         case "mania":
-            return 3.05 + 0.0223 * pp + 2.44e-06 * Math.pow(pp, 2);
+            return 0.227 + 0.0306 * pp + 1.07e-6 * Math.pow(pp, 2);
         case "fruits":
-            return -3.53 + 0.048 * pp + 2.68e-06 * Math.pow(pp, 2);
+            return -4.63 + 0.0564 * pp + 2.11e-6 * Math.pow(pp, 2);
     }
 }
