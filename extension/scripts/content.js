@@ -55,7 +55,7 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
         let waitForData = new Promise((resolve, reject) => {
             var observer = new MutationObserver((mutations) => {
                 mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
-                    if (node.querySelectorAll('.js-react--profile-page')) {
+                    if (node.querySelectorAll('.js-react[data-react="profile-page"]')) {
                         observer.disconnect();
                         resolve();
                     }
@@ -69,7 +69,7 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
     /**
      * @type UserData
      */
-    const userData = JSON.parse(document.body.querySelector('.js-react--profile-page').attributes.getNamedItem('data-initial-data').value);
+    const userData = JSON.parse(document.body.querySelector('.js-react[data-react="profile-page"]').attributes.getNamedItem('data-initial-data').value);
 
     const pp = userData.user.statistics.pp;
     const playtime = userData.user.statistics.play_time / 3600 + additionalPlaytimeHours;
@@ -139,7 +139,7 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
 }
 
 function predictFuture(goalpp) {
-    const userData = JSON.parse(document.body.querySelector('.js-react--profile-page').attributes.getNamedItem('data-initial-data').value)
+    const userData = JSON.parse(document.body.querySelector('.js-react[data-react="profile-page"]').attributes.getNamedItem('data-initial-data').value)
     const pp = userData.user.statistics.pp;
     const expectedPlaytime = calculateExpectedPlaytime(goalpp, userData.current_mode);
     const playtime = userData.user.statistics.play_time / 3600;
@@ -184,12 +184,12 @@ browser.runtime.onMessage.addListener(
 function calculateExpectedPlaytime(pp, mode) {
     switch (mode) {
         case "osu":
-            return -4.49 + 0.0601 * pp + 9.66e-6 * Math.pow(pp, 2);
+            return -12 + 0.0781 * pp + 6.01e-6 * Math.pow(pp, 2);
         case "taiko":
-            return -0.159 + 8.91e-3 * pp + 3.29e-6 * Math.pow(pp, 2);
+            return -1.08 + 0.0179 * pp + 1.65e-6 * Math.pow(pp, 2);
         case "mania":
-            return 0.227 + 0.0306 * pp + 1.07e-6 * Math.pow(pp, 2);
+            return -0.601 + 0.0321 * pp + 7.69e-7 * Math.pow(pp, 2);
         case "fruits":
-            return -4.63 + 0.0564 * pp + 2.11e-6 * Math.pow(pp, 2);
+            return -4.14 + 0.0458 * pp + 2.38e-6 * Math.pow(pp, 2);
     }
 }
