@@ -55,7 +55,7 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
         let waitForData = new Promise((resolve, reject) => {
             var observer = new MutationObserver((mutations) => {
                 mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
-                    if (node.querySelectorAll('.js-react--profile-page')) {
+                    if (node.querySelectorAll('.js-react[data-react="profile-page"]')) {
                         observer.disconnect();
                         resolve();
                     }
@@ -69,7 +69,7 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
     /**
      * @type UserData
      */
-    const userData = JSON.parse(document.body.querySelector('.js-react--profile-page').attributes.getNamedItem('data-initial-data').value);
+    const userData = JSON.parse(document.body.querySelector('.js-react[data-react="profile-page"]').attributes.getNamedItem('data-initial-data').value);
 
     const pp = userData.user.statistics.pp;
     const playtime = userData.user.statistics.play_time / 3600 + additionalPlaytimeHours;
@@ -139,7 +139,7 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
 }
 
 function predictFuture(goalpp) {
-    const userData = JSON.parse(document.body.querySelector('.js-react--profile-page').attributes.getNamedItem('data-initial-data').value)
+    const userData = JSON.parse(document.body.querySelector('.js-react[data-react="profile-page"]').attributes.getNamedItem('data-initial-data').value)
     const pp = userData.user.statistics.pp;
     const expectedPlaytime = calculateExpectedPlaytime(goalpp, userData.current_mode);
     const playtime = userData.user.statistics.play_time / 3600;
