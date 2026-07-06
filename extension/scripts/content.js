@@ -111,6 +111,8 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
         iiElementAlreadyExists.remove();
     }
 
+    const iiRankColor = levelTierColor(ii, userData.current_mode);
+
     const outerDiv = document.createElement('div');
     outerDiv.className = 'value-display value-display--plain';
     outerDiv.id = 'iiElement';
@@ -120,17 +122,13 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
     labelDiv.textContent = 'ii';
 
     const valueDiv = document.createElement('div');
-    valueDiv.className = 'value-display__value';
+    valueDiv.className = ['rank-value', iiRankColor.class].join(' ');
     valueDiv.textContent = ii > 0 && pp > 0 && playtime > 0 ? ii.toFixed(2) + "x" : "-";
 
-    let color;
-    if (ii > 1) {
-        color = `hsl(120, 100%, ${100 - 50 * (1 - (1 / ii))}%)`;
-    } else if (ii < 1 && ii > 0) {
-        color = `hsl(0, 100%, ${100 - 50 * (1 - ii)}%)`;
+    // Only add color when needed, otherwise leave it to the default 'rank-value' class to handle it
+    if (iiRankColor.color && valueDiv.textContent !== '-') {
+        valueDiv.style.cssText = `--colour: ${iiRankColor.color};`;
     }
-
-    valueDiv.style.color = color;
 
     outerDiv.appendChild(labelDiv);
     outerDiv.appendChild(valueDiv);
@@ -192,4 +190,60 @@ function calculateExpectedPlaytime(pp, mode) {
         case "fruits":
             return -4.14 + 0.0458 * pp + 2.38e-6 * Math.pow(pp, 2);
     }
+}
+
+function levelTierColor(ii = 1, mode) {
+    /* osu! tier colors
+        --level-tier-iron: #bab3ab, #bab3ab;
+        --level-tier-bronze: #b88f7a, #855c47;
+        --level-tier-silver: #e0e0eb, #a3a3c2;
+        --level-tier-gold: #f0e4a8, #e0c952;
+        --level-tier-platinum: #a8f0ef, #52e0df;
+        --level-tier-rhodium: #d9f8d3, #a0cf96;
+        --level-tier-radiant: #97dcff, #ed82ff;
+        --level-tier-lustrous: #ffe600, #ed82ff;
+    */
+   const OSU_COLORS = Object.freeze({
+        base: { color: '', class: 'rank-value--base' },
+        negative: { color: `hsl(0, 100%, ${Math.max(65, 100 - 50 * (1 - ii))}%)`, class: 'rank-value--base' },
+        iron: { color: 'var(--level-tier-iron)', class: 'rank-value--iron' }, // #bab3ab, #bab3ab;
+        bronze: { color: 'var(--level-tier-bronze)', class: 'rank-value--bronze' }, // #b88f7a, #855c47;
+        silver: { color: 'var(--level-tier-silver)', class: 'rank-value--silver' }, // #e0e0eb, #a3a3c2;
+        gold: { color: 'var(--level-tier-gold)', class: 'rank-value--gold' }, // #f0e4a8, #e0c952;
+        platinum: { color: 'var(--level-tier-platinum)', class: 'rank-value--platinum' }, // #a8f0ef, #52e0df;
+        rhodium: { color: 'var(--level-tier-rhodium)', class: 'rank-value--rhodium' },    // #d9f8d3, #a0cf96;
+        radiant: { color: 'var(--level-tier-radiant)', class: 'rank-value--radiant' }, // #97dcff, #ed82ff;
+        lustrous: { color: 'var(--level-tier-lustrous)', class: 'rank-value--lustrous' }, // #ffe600, #ed82ff;
+    });
+
+    if (ii < 1)
+        return OSU_COLORS.negative;
+
+    if (!isFinite(ii) || mode !== 'osu') return OSU_COLORS.base;
+
+    if (ii >= 44.00220668) // equivalent to top 5
+        return OSU_COLORS.lustrous;
+
+    if (ii >= 33.39009666) // equivalent to top 0.05%
+        return OSU_COLORS.radiant;
+
+    if (ii >= 17.58398203) // equivalent to top 0.15%
+        return OSU_COLORS.rhodium;
+
+    if (ii >= 7.395896618) // equivalent to top 0.5%
+        return OSU_COLORS.platinum;
+
+    if (ii >= 4.104942394) // equivalent to top 1.5%
+        return OSU_COLORS.gold;
+
+    if (ii >= 2.458582019) // equivalent to top 5%
+        return OSU_COLORS.silver;
+
+    if (ii >= 1.716098996) // equivalent to top 15%
+        return OSU_COLORS.bronze;
+
+    if (ii >= 1.042199973) // equivalent to top 50%
+        return OSU_COLORS.iron;
+
+    return OSU_COLORS.base;
 }
