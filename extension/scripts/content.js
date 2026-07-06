@@ -103,7 +103,7 @@ async function ii(additionalPlaytimeHours, newLoad = false) {
     updateElementStyles();
     updateElementGap('8px');
 
-    const parentElement = document.querySelector('.profile-detail__values--grid');
+    const parentElement = document.querySelector('.profile-detail-stats__values--grid');
 
     const iiElementAlreadyExists = document.getElementById('iiElement');
 
@@ -151,7 +151,7 @@ function predictFuture(goalpp) {
 // Function to update grid-template-columns for elements with the class
 function updateElementStyles() {
     // Select all elements with the class 'profile-detail__values--grid'
-    const elements = document.querySelectorAll('.profile-detail__values--grid');
+    const elements = document.querySelectorAll('.profile-detail-stats__values--grid');
 
     // Loop through each element and update its style
     elements.forEach(element => {
@@ -161,7 +161,7 @@ function updateElementStyles() {
 
 function updateElementGap(newGap) {
     // Select all elements with the class 'profile-detail__values'
-    const elements = document.querySelectorAll('.profile-detail__values');
+    const elements = document.querySelectorAll('.profile-detail-stats__values');
 
     // Loop through each element and update its style
     elements.forEach(element => {
